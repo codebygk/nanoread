@@ -6,6 +6,7 @@
 
 import { NavBtn }       from "@/components/ui/NavBtn";
 import { FileTextIcon, HistoryIcon, SettingsIcon, SunIcon, MoonIcon } from "@/components/icons";
+import Image from "next/image";
 
 interface AppNavProps {
   historyCount:    number;
@@ -37,28 +38,29 @@ export function AppNav({
       }}
     >
       <div style={{
-        maxWidth:       720,
+        maxWidth:       920,
         margin:         "0 auto",
-        padding:        "0 24px",
-        height:         60,
+        padding:        "0 16px",
+        height:         56,
         display:        "flex",
         alignItems:     "center",
         justifyContent: "space-between",
+        gap:            8,
       }}>
         <Logo />
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           {/* History */}
           <NavBtn onClick={onOpenHistory}>
             <HistoryIcon />
-            History
+            <span className="nav-label">History</span>
             {historyCount > 0 && (
               <span style={{
                 background:   "var(--accent)",
                 color:        "white",
                 fontSize:     10,
                 fontWeight:   600,
-                padding:      "1px 5px",
+                padding:      "1px 8px",
                 borderRadius: 10,
                 lineHeight:   1.6,
               }}>
@@ -70,7 +72,7 @@ export function AppNav({
           {/* Settings */}
           <NavBtn onClick={onOpenSettings}>
             <SettingsIcon />
-            Settings
+            <span className="nav-label">Settings</span>
             {!hasApiKey && (
               <span style={{
                 width:        6,
@@ -78,6 +80,7 @@ export function AppNav({
                 borderRadius: "50%",
                 background:   "#f59e0b",
                 display:      "inline-block",
+                flexShrink:   0,
               }} />
             )}
           </NavBtn>
@@ -98,6 +101,7 @@ export function AppNav({
               justifyContent: "center",
               cursor:         "pointer",
               transition:     "all 0.15s",
+              flexShrink:     0,
             }}
             onMouseOver={e => (e.currentTarget.style.borderColor = "var(--accent)")}
             onMouseOut={e  => (e.currentTarget.style.borderColor = "var(--border)")}
@@ -106,34 +110,30 @@ export function AppNav({
           </button>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 480px) {
+          .nav-label { display: none; }
+        }
+      `}</style>
     </nav>
   );
 }
 
-// ── Logo ──────────────────────────────────────
+// -- Logo --------------------------------------
 
 function Logo() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <div style={{
-        width:          32,
-        height:         32,
-        borderRadius:   8,
-        background:     "linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)",
-        display:        "flex",
-        alignItems:     "center",
-        justifyContent: "center",
-        boxShadow:      "0 2px 8px rgba(99,102,241,0.35)",
-        flexShrink:     0,
-        color:          "white",
-      }}>
-        <FileTextIcon size={16} />
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+      <Image src={"/favicon.svg"} width={30} height={30} alt="nanoread-logo" />
       <span style={{
         fontWeight:    600,
-        fontSize:      "1rem",
+        fontSize:      "0.95rem",
         color:         "var(--text)",
         letterSpacing: "-0.02em",
+        overflow:      "hidden",
+        textOverflow:  "ellipsis",
+        whiteSpace:    "nowrap",
       }}>
         Nanoread
       </span>

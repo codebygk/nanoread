@@ -36,78 +36,102 @@ export function UrlSearchCard({
     try {
       const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
       const parsed = new URL(withScheme);
-      // must have a real hostname with at least one dot (e.g. example.com)
       return parsed.hostname.includes(".");
     } catch {
       return false;
     }
   };
-  const isDisabled = loading || !isValidUrl(url) || disabled;
+
+  const isDisabled    = loading || !isValidUrl(url) || disabled;
   const endpointLabel = getEndpointLabel(settings.baseUrl);
 
   return (
-    <div className="fade-up-2" style={{
-      background:   "var(--bg-card)",
-      border:       "1px solid var(--border)",
-      borderRadius: 16,
-      padding:      20,
-      boxShadow:    "var(--shadow-md)",
-      marginBottom: 20,
-    }}>
-      {/* ── URL input row ── */}
-      <form onSubmit={onSubmit}>
-        <div
-          style={{
-            display:    "flex",
-            alignItems: "center",
-            gap:        10,
-            background: "var(--bg-subtle)",
-            border:     "1.5px solid var(--border)",
-            borderRadius: 10,
-            padding:    "4px 4px 4px 14px",
-            transition: "border-color 0.15s",
-          }}
-          onFocusCapture={e => (e.currentTarget.style.borderColor = "var(--accent)")}
-          onBlurCapture={e  => (e.currentTarget.style.borderColor = "var(--border)")}
-        >
-          <span style={{ flexShrink: 0, color: "var(--text-3)", display: "flex" }}>
-            <LinkIcon size={16} />
-          </span>
+    <>
+      <div className="fade-up-2" style={{
+        background:   "var(--bg-card)",
+        border:       "1px solid var(--border)",
+        borderRadius: 16,
+        padding:      20,
+        boxShadow:    "var(--shadow-md)",
+        marginBottom: 20,
+      }}>
+        {/* -- URL input row -- */}
+        <form onSubmit={onSubmit}>
+          {/* Desktop: input + button inline. Mobile: stacked */}
+          <div className="url-input-row"
+            onFocusCapture={e => (e.currentTarget.style.borderColor = "var(--accent)")}
+            onBlurCapture={e  => (e.currentTarget.style.borderColor = "var(--border)")}
+          >
+            <span style={{ flexShrink: 0, color: "var(--text-3)", display: "flex" }}>
+              <LinkIcon size={16} />
+            </span>
 
-          <input
-            ref={inputRef}
-            type="text"
-            value={url}
-            onChange={e => onChange(e.target.value)}
-            placeholder="Paste a URL to summarize..."
-            disabled={loading}
-            style={{
-              flex:       1,
-              background: "transparent",
-              border:     "none",
-              outline:    "none",
-              color:      "var(--text)",
-              fontSize:   "0.9375rem",
-              fontFamily: "inherit",
-              padding:    "8px 0",
-            }}
-          />
+            <input
+              ref={inputRef}
+              type="url"
+              inputMode="url"
+              value={url}
+              onChange={e => onChange(e.target.value)}
+              placeholder="Paste a URL to summarize..."
+              disabled={loading}
+              style={{
+                flex:       1,
+                background: "transparent",
+                border:     "none",
+                outline:    "none",
+                color:      "var(--text)",
+                fontSize:   "0.9375rem",
+                fontFamily: "inherit",
+                padding:    "8px 0",
+                minWidth:   0,
+              }}
+            />
 
-          <SubmitButton loading={loading} disabled={isDisabled} />
-        </div>
-      </form>
+            <SubmitButton loading={loading} disabled={isDisabled} />
+          </div>
+        </form>
 
-      {/* ── Status row ── */}
-      <StatusRow
-        endpointLabel={endpointLabel}
-        model={settings.model}
-        hasApiKey={!!settings.apiKey}
-      />
-    </div>
+        {/* -- Status row -- */}
+        <StatusRow
+          endpointLabel={endpointLabel}
+          model={settings.model}
+          hasApiKey={!!settings.apiKey}
+        />
+      </div>
+
+      <style>{`
+        .url-input-row {
+          display:       flex;
+          align-items:   center;
+          gap:           10px;
+          background:    var(--bg-subtle);
+          border:        1.5px solid var(--border);
+          border-radius: 10px;
+          padding:       4px 4px 4px 14px;
+          transition:    border-color 0.15s;
+        }
+
+        @media (max-width: 480px) {
+          .url-input-row {
+            flex-wrap:  wrap;
+            padding:    10px 12px;
+            gap:        8px;
+          }
+          .url-input-row input {
+            width: 100%;
+            flex:  1 1 100%;
+          }
+          .url-submit-btn {
+            width:           100% !important;
+            justify-content: center;
+          }
+        }
+      `}</style>
+    </>
   );
 }
 
-// ── Sub-components ────────────────────────────
+// -- Sub-components ----------------------------
 
 interface SubmitButtonProps {
   loading:  boolean;
@@ -119,6 +143,7 @@ function SubmitButton({ loading, disabled }: SubmitButtonProps) {
     <button
       type="submit"
       disabled={disabled}
+      className="url-submit-btn"
       style={{
         background:   disabled ? "var(--border)" : "var(--accent)",
         color:        disabled ? "var(--text-3)" : "white",
@@ -134,10 +159,11 @@ function SubmitButton({ loading, disabled }: SubmitButtonProps) {
         transition:   "all 0.15s",
         flexShrink:   0,
         fontFamily:   "inherit",
+        whiteSpace:   "nowrap",
       }}
     >
       {loading
-        ? <><span className="spinner" /> Summarizing…</>
+        ? <><span className="spinner" /> Summarizing...</>
         : "Summarize"
       }
     </button>
@@ -151,14 +177,17 @@ interface StatusRowProps {
 }
 
 function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
+  // Truncate model name on small screens
+  const shortModel = model.length > 20 ? model.slice(0, 18) + "..." : model;
+
   return (
     <div style={{
-      display:    "flex",
-      alignItems: "center",
+      display:        "flex",
+      alignItems:     "center",
       justifyContent: "space-between",
-      marginTop:  12,
-      flexWrap:   "wrap",
-      gap:        6,
+      marginTop:      12,
+      flexWrap:       "wrap",
+      gap:            6,
     }}>
       <span style={{
         display:      "inline-flex",
@@ -170,6 +199,10 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
         fontWeight:   500,
         padding:      "3px 10px",
         borderRadius: 20,
+        maxWidth:     "60%",
+        overflow:     "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace:   "nowrap",
       }}>
         <span style={{
           width:        6,
@@ -177,8 +210,9 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
           borderRadius: "50%",
           background:   "var(--accent)",
           display:      "inline-block",
+          flexShrink:   0,
         }} />
-        {endpointLabel} · {model}
+        {endpointLabel} - {shortModel}
       </span>
 
       <span style={{
@@ -188,6 +222,7 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
         alignItems: "center",
         gap:        4,
         fontWeight: 500,
+        flexShrink: 0,
       }}>
         {hasApiKey
           ? <><CheckIcon /> Your API key</>
@@ -198,7 +233,7 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
   );
 }
 
-// ── Example chips ─────────────────────────────
+// -- Example chips -----------------------------
 
 interface ExampleChipsProps {
   onSelect: (url: string) => void;
@@ -245,7 +280,7 @@ export function ExampleChips({ onSelect }: ExampleChipsProps) {
             e.currentTarget.style.color       = "var(--text-2)";
           }}
         >
-          {ex.emoji} {ex.label}
+          {ex.label}
         </button>
       ))}
     </div>

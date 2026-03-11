@@ -77,9 +77,9 @@ export type ProviderPreset = (typeof PROVIDER_PRESETS)[number];
 
 // ── Example URLs shown on the home page ───────
 export const EXAMPLE_URLS = [
-    { label: "CodeByGK", url: "https://codebygk.vercel.app", emoji: "🔥" },
-    { label: "QACanCode", url: "https://qacancode.com", emoji: "🤖" },
-    { label: "Dorkmine", url: "https://dorkmine.vercel.app", emoji: "📱" },
+    { label: "qacancode.com", url: "https://qacancode.com"},
+    { label: "codebygk.vercel.app", url: "https://codebygk.vercel.app" },
+    { label: "dorkmine.vercel.app", url: "https://dorkmine.vercel.app" },
 ] as const;
 
 // ── Summarize API endpoint ─────────────────────

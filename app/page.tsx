@@ -29,6 +29,7 @@ import HistoryPanel        from "@/components/HistoryPanel";
 
 // Types
 import type { SummarizeResult } from "@/types";
+import Image from "next/image";
 
 // ---------------------------------------------
 
@@ -162,7 +163,9 @@ export default function Home() {
         flex:     1,
       }}>
         {/* Hero */}
-        <div className="fade-up-1" style={{ textAlign: "center", marginBottom: 40 }}>
+        <div className="fade-up-1" style={{ textAlign: "center", marginBottom: 40, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Image src={"/read.svg"} width={250} height={250} alt="nanoread-hero-image" />
+          
           <h1 className="font-display" style={{
             fontSize:      "clamp(1.9rem, 5vw, 2.75rem)",
             color:         "var(--text)",
@@ -202,7 +205,7 @@ export default function Home() {
           disabled={limitReached}
         />
 
-        {!result && !loading && !error && (
+        {!result && !loading && !error && !limitReached && (
           <ExampleChips onSelect={handleExampleSelect} />
         )}
 
