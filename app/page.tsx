@@ -236,17 +236,18 @@ export default function Home() {
 
         {/* Hero */}
         <div className="fade-up-1" style={{ textAlign: "center", marginBottom: 40 }}>
-          <h1 className="font-serif" style={{
-            fontSize: "clamp(2rem, 5vw, 2.75rem)",
+          <h1 className="font-display" style={{
+            fontSize: "clamp(1.9rem, 5vw, 2.75rem)",
             color: "var(--text)",
-            lineHeight: 1.2,
-            marginBottom: 12,
-            letterSpacing: "-0.02em",
+            lineHeight: 1.15,
+            marginBottom: 14,
+            letterSpacing: "-0.03em",
+            fontWeight: 700,
           }}>
             Summarize any webpage<br />
-            <span style={{ color: "var(--accent)" }}>in one click</span>
+            <span style={{ color: "var(--accent)", fontWeight: 700 }}>in one click</span>
           </h1>
-          <p style={{ color: "var(--text-2)", fontSize: "1rem", lineHeight: 1.6 }}>
+          <p style={{ color: "var(--text-2)", fontSize: "1rem", lineHeight: 1.65, fontWeight: 400, letterSpacing: "-0.01em" }}>
             Paste a URL, choose your AI provider, get the key points instantly.
           </p>
         </div>
@@ -476,7 +477,7 @@ export default function Home() {
                   <a href={result.url} target="_blank" rel="noopener noreferrer" style={{
                     display: "inline-flex", alignItems: "center", gap: 4,
                     color: "var(--text-3)", fontSize: "0.75rem",
-                    textDecoration: "none", fontFamily: "Geist Mono, monospace",
+                    textDecoration: "none", fontFamily: "JetBrains Mono, monospace",
                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     maxWidth: "100%",
                   }}>
