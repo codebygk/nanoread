@@ -4,7 +4,7 @@
 // Home page – orchestrates all state and
 // composes the UI from focused sub-components.
 // No business logic or inline styles live here.
-// ---------------------------------------------
+// ─────────────────────────────────────────────
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -205,7 +205,7 @@ export default function Home() {
           disabled={limitReached}
         />
 
-        {!result && !loading && !error && !limitReached && (
+        {!result && !loading && !error && (!limitReached || !!settings.apiKey) && (
           <ExampleChips onSelect={handleExampleSelect} />
         )}
 
@@ -248,7 +248,7 @@ export default function Home() {
       {showSettings && (
         <SettingsModal
           settings={settings}
-          onSave={next => { saveSettings(next); setShowSettings(false); setError(""); setLimitReached(false); }}
+          onSave={next => { saveSettings(next); setShowSettings(false); setError(""); setLimitReached(!next.apiKey && freeUsed >= FREE_TIER_LIMIT); }}
           onClose={() => setShowSettings(false)}
         />
       )}
