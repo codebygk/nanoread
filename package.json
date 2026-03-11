@@ -1,5 +1,5 @@
 {
-  "name": "webpage-summarizer",
+  "name": "nanoread",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,7 +13,8 @@
     "next": "16.1.6",
     "openai": "^6.27.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "@neondatabase/serverless": "latest"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

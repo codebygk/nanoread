@@ -18,6 +18,7 @@ interface UrlSearchCardProps {
   inputRef:    RefObject<HTMLInputElement | null>;
   onChange:    (url: string) => void;
   onSubmit:    (e: React.FormEvent | null, overrideUrl?: string) => void;
+  disabled?:   boolean;
 }
 
 export function UrlSearchCard({
@@ -27,8 +28,9 @@ export function UrlSearchCard({
   inputRef,
   onChange,
   onSubmit,
+  disabled = false,
 }: UrlSearchCardProps) {
-  const isDisabled   = loading || !url.trim() || !settings.apiKey;
+  const isDisabled = loading || !url.trim() || disabled;
   const endpointLabel = getEndpointLabel(settings.baseUrl);
 
   return (
@@ -65,7 +67,7 @@ export function UrlSearchCard({
             type="text"
             value={url}
             onChange={e => onChange(e.target.value)}
-            placeholder="Paste a URL to summarize…"
+            placeholder="Paste a URL to summarize..."
             disabled={loading}
             style={{
               flex:       1,
@@ -169,15 +171,15 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
 
       <span style={{
         fontSize:   "0.75rem",
-        color:      hasApiKey ? "var(--success)" : "#f59e0b",
+        color:      hasApiKey ? "var(--success)" : "var(--accent)",
         display:    "flex",
         alignItems: "center",
         gap:        4,
         fontWeight: 500,
       }}>
         {hasApiKey
-          ? <><CheckIcon /> API key set</>
-          : <>🔑 No key - add in Settings</>
+          ? <><CheckIcon /> Your API key</>
+          : <><CheckIcon /> Free tier</>
         }
       </span>
     </div>

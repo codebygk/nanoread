@@ -6,7 +6,6 @@
 
 import { NavBtn }       from "@/components/ui/NavBtn";
 import { FileTextIcon, HistoryIcon, SettingsIcon, SunIcon, MoonIcon } from "@/components/icons";
-import Image from "next/image";
 
 interface AppNavProps {
   historyCount:    number;
@@ -38,7 +37,7 @@ export function AppNav({
       }}
     >
       <div style={{
-        maxWidth:       1080,
+        maxWidth:       720,
         margin:         "0 auto",
         padding:        "0 24px",
         height:         60,
@@ -116,7 +115,20 @@ export function AppNav({
 function Logo() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-    <Image src={"/favicon.svg"} width={30} height={30} alt="nanoread-logo"/>  
+      <div style={{
+        width:          32,
+        height:         32,
+        borderRadius:   8,
+        background:     "linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)",
+        display:        "flex",
+        alignItems:     "center",
+        justifyContent: "center",
+        boxShadow:      "0 2px 8px rgba(99,102,241,0.35)",
+        flexShrink:     0,
+        color:          "white",
+      }}>
+        <FileTextIcon size={16} />
+      </div>
       <span style={{
         fontWeight:    600,
         fontSize:      "1rem",

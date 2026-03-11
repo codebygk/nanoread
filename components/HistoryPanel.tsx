@@ -23,7 +23,7 @@ export default function HistoryPanel({
 }: HistoryPanelProps) {
   return (
     <Modal onClose={onClose} maxWidth={520}>
-      {/* ── Header ── */}
+      {/* -- Header -- */}
       <div style={{
         padding:        "20px 24px",
         borderBottom:   "1px solid var(--border)",
@@ -80,12 +80,12 @@ export default function HistoryPanel({
               fontFamily:     "inherit",
             }}
           >
-            ✕
+            x
           </button>
         </div>
       </div>
 
-      {/* ── List ── */}
+      {/* -- List -- */}
       <div style={{ overflowY: "auto", flex: 1, padding: "12px" }}>
         {history.length === 0
           ? <EmptyState />
@@ -102,7 +102,7 @@ export default function HistoryPanel({
   );
 }
 
-// ── Sub-components ────────────────────────────
+// -- Sub-components ----------------------------
 
 function EmptyState() {
   return (

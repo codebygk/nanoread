@@ -21,6 +21,7 @@ export interface SummarizeResult {
   summary: string;
   title: string;
   url: string;
+  freeUsed?: number;   // present when default key was used
 }
 
 export interface SummarizeRequest {

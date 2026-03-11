@@ -18,6 +18,7 @@ export const FETCH_TIMEOUT_MS = 10000;
 export const MAX_TOKENS = 1024;
 export const COPY_RESET_MS = 2000;
 export const URL_TRUNCATE_LEN = 60;
+export const FREE_TIER_LIMIT = 3;
 
 // ── Default settings ──────────────────────────
 export const DEFAULT_SETTINGS: Settings = {

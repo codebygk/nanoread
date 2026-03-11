@@ -4,7 +4,7 @@
 // Home page – orchestrates all state and
 // composes the UI from focused sub-components.
 // No business logic or inline styles live here.
-// ─────────────────────────────────────────────
+// ---------------------------------------------
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -16,6 +16,7 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 // API
 import { summarizePage, ApiError } from "@/lib/api";
+import { FREE_TIER_LIMIT }         from "@/lib/constants";
 
 // Components
 import { AppNav }          from "@/components/AppNav";
@@ -28,19 +29,21 @@ import HistoryPanel        from "@/components/HistoryPanel";
 
 // Types
 import type { SummarizeResult } from "@/types";
-import Image from "next/image";
 
-// ─────────────────────────────────────────────
+// ---------------------------------------------
 
 export default function Home() {
   const [url,          setUrl]          = useState("");
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState("");
+  const [limitReached, setLimitReached] = useState(false);
   const [result,       setResult]       = useState<SummarizeResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showHistory,  setShowHistory]  = useState(false);
+  const [freeUsed,     setFreeUsed]     = useState(0);
+  const [usageReady,   setUsageReady]   = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef   = useRef<HTMLInputElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
 
   const { settings,  saveSettings,  loadSettings  } = useSettings();
@@ -49,16 +52,26 @@ export default function Home() {
   const { dark,      toggleTheme,   initTheme      } = useTheme();
   const { copied,    copy                          } = useCopyToClipboard();
 
-  // ── Initialise from localStorage on mount ──
+  // -- Initialise from localStorage on mount --
   useEffect(() => {
     loadSettings();
     loadHistory();
     initTheme();
     inputRef.current?.focus();
+
+    // Restore free usage count from server cookie on reload
+    fetch("/api/usage", { credentials: "same-origin" })
+      .then(r => r.json())
+      .then(data => {
+        if (typeof data.freeUsed === "number") setFreeUsed(data.freeUsed);
+        if (data.limitReached) setLimitReached(true);
+      })
+      .catch(() => {})
+      .finally(() => setUsageReady(true));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Summarize ──────────────────────────────
+  // -- Summarize ------------------------------
   const handleSubmit = useCallback(async (
     e: React.FormEvent | null,
     overrideUrl?: string,
@@ -69,6 +82,7 @@ export default function Home() {
 
     setLoading(true);
     setError("");
+    setLimitReached(false);
     setResult(null);
 
     try {
@@ -78,18 +92,30 @@ export default function Home() {
         baseUrl: settings.baseUrl || undefined,
         model:   settings.model,
       });
+
       setResult(data);
       addToHistory(data, settings.model);
-      setResult(data);
+
+      // Update free usage count if server returned it
+      if (data.freeUsed !== undefined) {
+        setFreeUsed(data.freeUsed);
+      }
+
+      // Scroll to result
       setTimeout(() => {
         summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
+
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : "Network error. Please check your connection.",
-      );
+      if (err instanceof ApiError) {
+        setError(err.message);
+        if (err.limitReached) {
+          setLimitReached(true);
+          setFreeUsed(FREE_TIER_LIMIT); // mark as exhausted in UI
+        }
+      } else {
+        setError("Network error. Please check your connection.");
+      }
     } finally {
       setLoading(false);
     }
@@ -113,7 +139,9 @@ export default function Home() {
     setShowHistory(false);
   }, []);
 
-  // ── Render ─────────────────────────────────
+  const showFreeBanner = !settings.apiKey;
+
+  // -- Render ---------------------------------
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column" }}>
 
@@ -127,25 +155,24 @@ export default function Home() {
       />
 
       <main style={{
-        maxWidth: 920,
+        maxWidth: 720,
         margin:   "0 auto",
         padding:  "48px 24px 80px",
         width:    "100%",
         flex:     1,
       }}>
         {/* Hero */}
-        <div className="fade-up-1" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: 40 }}>
-          <Image src={"/read.svg"} alt="nanoread-hero-image" width={250} height={250}/>
+        <div className="fade-up-1" style={{ textAlign: "center", marginBottom: 40 }}>
           <h1 className="font-display" style={{
-            fontSize:      "clamp(2rem, 8vw, 4rem)",
+            fontSize:      "clamp(1.9rem, 5vw, 2.75rem)",
             color:         "var(--text)",
             lineHeight:    1.15,
             marginBottom:  14,
             letterSpacing: "-0.03em",
             fontWeight:    700,
           }}>
-            Summarize any webpage { " " }
-            <span style={{ color: "var(--accent)", fontWeight: 700 }}> instantly!</span>
+            Summarize any webpage<br />
+            <span style={{ color: "var(--accent)", fontWeight: 700 }}>in one click</span>
           </h1>
           <p style={{
             color:         "var(--text-2)",
@@ -154,12 +181,15 @@ export default function Home() {
             fontWeight:    400,
             letterSpacing: "-0.01em",
           }}>
-            Paste a URL or select from the examples to get the summary of the webpage instantly.
+            Paste a URL, choose your AI provider, get the key points instantly.
           </p>
         </div>
 
-        {!settings.apiKey && (
-          <NoApiKeyBanner onOpenSettings={() => setShowSettings(true)} />
+        {showFreeBanner && usageReady && (
+          <NoApiKeyBanner
+            freeUsed={freeUsed}
+            onOpenSettings={() => setShowSettings(true)}
+          />
         )}
 
         <UrlSearchCard
@@ -169,6 +199,7 @@ export default function Home() {
           inputRef={inputRef}
           onChange={setUrl}
           onSubmit={handleSubmit}
+          disabled={limitReached}
         />
 
         {!result && !loading && !error && (
@@ -179,12 +210,12 @@ export default function Home() {
         {loading && <LoadingSkeleton />}
         {result  && !loading && (
           <div ref={summaryRef}>
-          <SummaryResult
-            result={result}
-            copied={copied}
-            onCopy={() => copy(result.summary)}
-            onReset={handleReset}
-          />
+            <SummaryResult
+              result={result}
+              copied={copied}
+              onCopy={() => copy(result.summary)}
+              onReset={handleReset}
+            />
           </div>
         )}
       </main>
@@ -200,7 +231,6 @@ export default function Home() {
         bottom:     0,
         zIndex:     30,
       }}>
-        
         Built by{" "}
         <a
           href="https://codebygk.vercel.app"
@@ -215,7 +245,7 @@ export default function Home() {
       {showSettings && (
         <SettingsModal
           settings={settings}
-          onSave={next => { saveSettings(next); setShowSettings(false); }}
+          onSave={next => { saveSettings(next); setShowSettings(false); setError(""); setLimitReached(false); }}
           onClose={() => setShowSettings(false)}
         />
       )}

@@ -74,7 +74,7 @@ export default function SettingsModal({ settings, onSave, onClose }: SettingsMod
           {/* ── Base URL ── */}
           <FormField
             label="Base URL"
-            hint="Compatible with OpenAI, Groq, Ollama, OpenRouter, LM Studio, Together, Mistral…"
+            hint="Compatible with OpenAI, Groq, Ollama, OpenRouter, LM Studio, Together, Mistral..."
             action={
               <span style={{ fontSize: "0.7rem", color: "var(--text-3)" }}>
                 OpenAI-compatible endpoint
@@ -95,7 +95,7 @@ export default function SettingsModal({ settings, onSave, onClose }: SettingsMod
           {/* ── Model ── */}
           <FormField
             label="Model"
-            hint="Examples: llama3.2, mistral, llama-3.1-8b-instant"
+            hint="Examples: llama3.2, mistral, llama-3.3-70b-versatile"
           >
             <input
               type="text"

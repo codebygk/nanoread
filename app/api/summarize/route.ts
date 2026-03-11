@@ -1,7 +1,9 @@
 // ─────────────────────────────────────────────
 // POST /api/summarize
-// Fetches a webpage, strips boilerplate, and
-// summarises the content using an LLM.
+//
+// Free-tier rate limiting uses client IP stored
+// in Neon Postgres. Persists across reloads,
+// incognito, different browsers, and redeploays.
 // ─────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
@@ -12,33 +14,36 @@ import {
   MAX_CONTENT_CHARS,
   FETCH_TIMEOUT_MS,
   MAX_TOKENS,
+  FREE_TIER_LIMIT,
 } from "@/lib/constants";
+import { getUsage, incrementUsage } from "@/lib/ratelimit";
 import type { SummarizeRequest } from "@/types";
 
-// ── Webpage fetcher ───────────────────────────
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 async function fetchWebpage(url: string): Promise<{ title: string; text: string }> {
   const response = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (compatible; WebSummarizer/1.0)" },
     signal:  AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
-
   if (!response.ok) {
     throw new Error(`Failed to fetch webpage: ${response.status} ${response.statusText}`);
   }
-
   const html = await response.text();
   return extractTextFromHtml(html, MAX_CONTENT_CHARS);
 }
-
-// ── Route handler ─────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as SummarizeRequest;
     const { url, apiKey, baseUrl, model } = body;
 
-    // ── Validate input ──
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
@@ -50,14 +55,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
 
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "No API key provided. Please add your API key in Settings." },
-        { status: 401 },
-      );
+    let resolvedKey   = apiKey?.trim()  || "";
+    let resolvedBase  = baseUrl?.trim() || "https://api.openai.com/v1";
+    let resolvedModel = model           || "gpt-4o-mini";
+    let freeUsed: number | undefined;
+
+    if (!resolvedKey) {
+      const defaultKey   = process.env.DEFAULT_API_KEY  || "";
+      const defaultBase  = process.env.DEFAULT_BASE_URL || "https://api.openai.com/v1";
+      const defaultModel = process.env.DEFAULT_MODEL    || "gpt-4o-mini";
+
+      if (!defaultKey) {
+        return NextResponse.json(
+          { error: "No API key provided. Please add your API key in Settings." },
+          { status: 401 },
+        );
+      }
+
+      const ip           = getClientIp(req);
+      const currentCount = await getUsage(ip);
+
+      if (currentCount >= FREE_TIER_LIMIT) {
+        return NextResponse.json(
+          {
+            error: `You've used all ${FREE_TIER_LIMIT} free summaries. Add your own API key in Settings to continue -- Groq offers a generous free tier!`,
+            limitReached: true,
+          },
+          { status: 429 },
+        );
+      }
+
+      resolvedKey   = defaultKey;
+      resolvedBase  = defaultBase;
+      resolvedModel = defaultModel;
+      freeUsed      = await incrementUsage(ip);
     }
 
-    // ── Fetch & extract webpage content ──
     const { title, text } = await fetchWebpage(parsedUrl.toString());
 
     if (!text || text.length < 50) {
@@ -67,16 +100,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Call LLM ──
-    // Uses a single OpenAI-compatible client that works with any provider:
-    // OpenAI, Groq, Ollama, OpenRouter, LM Studio, Together, Mistral, etc.
-    const client = new OpenAI({
-      apiKey,
-      ...(baseUrl ? { baseURL: baseUrl } : {}),
-    });
+    const client = new OpenAI({ apiKey: resolvedKey, baseURL: resolvedBase });
 
     const response = await client.chat.completions.create({
-      model:      model ?? "gpt-4o-mini",
+      model:      resolvedModel,
       max_tokens: MAX_TOKENS,
       messages: [
         { role: "system", content: SUMMARIZE_SYSTEM_PROMPT },
@@ -86,15 +113,16 @@ export async function POST(req: NextRequest) {
 
     const summary = response.choices[0]?.message?.content ?? "";
 
-    return NextResponse.json({ summary, title, url: parsedUrl.toString() });
+    return NextResponse.json({
+      summary,
+      title,
+      url: parsedUrl.toString(),
+      ...(freeUsed !== undefined ? { freeUsed } : {}),
+    });
 
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unexpected error";
-    const isAuthError =
-      message.includes("401") ||
-      message.includes("API key") ||
-      message.includes("Incorrect API key");
-
+    const message     = err instanceof Error ? err.message : "Unexpected error";
+    const isAuthError = message.includes("401") || message.includes("API key") || message.includes("Incorrect API key");
     return NextResponse.json(
       { error: isAuthError ? "Invalid API key. Please check your settings." : message },
       { status: isAuthError ? 401 : 500 },
