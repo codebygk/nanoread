@@ -21,9 +21,9 @@ export const URL_TRUNCATE_LEN = 60;
 
 // ── Default settings ──────────────────────────
 export const DEFAULT_SETTINGS: Settings = {
-    baseUrl: "https://api.openai.com/v1",
+    baseUrl: "https://api.groq.com/openai/v1",
     apiKey: "",
-    model: "gpt-4o-mini",
+    model: "llama-3.1-8b-instant",
 };
 
 // ── LLM provider presets ──────────────────────
