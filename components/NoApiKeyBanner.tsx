@@ -57,8 +57,7 @@ export function NoApiKeyBanner({ freeUsed, onOpenSettings }: NoApiKeyBannerProps
               Free limit reached
             </p>
             <p style={{ fontSize: "0.81rem", color: "var(--text-2)", margin: "0 0 10px", lineHeight: 1.55 }}>
-              You've used all {FREE_TIER_LIMIT} free summaries. Add your own API key to keep going --
-              Groq offers a generous free tier.
+              You've used all {FREE_TIER_LIMIT} free summaries. Add your own API key to keep going.
             </p>
           </>
         ) : (

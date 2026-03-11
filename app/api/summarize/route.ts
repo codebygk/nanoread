@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       if (currentCount >= FREE_TIER_LIMIT) {
         return NextResponse.json(
           {
-            error: `You've used all ${FREE_TIER_LIMIT} free summaries. Add your own API key in Settings to continue -- Groq offers a generous free tier!`,
+            error: `You've used all ${FREE_TIER_LIMIT} free summaries. Add your own API key in Settings to continue.`,
             limitReached: true,
           },
           { status: 429 },

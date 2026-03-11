@@ -30,7 +30,19 @@ export function UrlSearchCard({
   onSubmit,
   disabled = false,
 }: UrlSearchCardProps) {
-  const isDisabled = loading || !url.trim() || disabled;
+  const isValidUrl = (raw: string): boolean => {
+    const trimmed = raw.trim();
+    if (!trimmed) return false;
+    try {
+      const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      const parsed = new URL(withScheme);
+      // must have a real hostname with at least one dot (e.g. example.com)
+      return parsed.hostname.includes(".");
+    } catch {
+      return false;
+    }
+  };
+  const isDisabled = loading || !isValidUrl(url) || disabled;
   const endpointLabel = getEndpointLabel(settings.baseUrl);
 
   return (

@@ -39,7 +39,7 @@ export async function summarizePage(
   if (!res.ok) {
     const message =
       res.status === 401
-        ? "API key issue -- please add your own key in Settings."
+        ? "API key issue - please add your own key in Settings."
         : (data.error as string) || "Something went wrong.";
     throw new ApiError(message, res.status, !!data.limitReached);
   }
