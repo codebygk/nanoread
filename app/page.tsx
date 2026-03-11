@@ -244,8 +244,8 @@ export default function Home() {
             letterSpacing: "-0.03em",
             fontWeight: 700,
           }}>
-            Summarize any webpage<br />
-            <span style={{ color: "var(--accent)", fontWeight: 700 }}>in one click</span>
+            Summarize any webpage <span style={{ color: "var(--accent)", fontWeight: 700 }}>instantly!</span>
+            
           </h1>
           <p style={{ color: "var(--text-2)", fontSize: "1rem", lineHeight: 1.65, fontWeight: 400, letterSpacing: "-0.01em" }}>
             Paste a URL, choose your AI provider, get the key points instantly.
