@@ -2,7 +2,8 @@
 
 A clean, fast web app that summarizes any webpage using AI. Paste a URL, pick your provider, and get the key points in seconds.
 
-Built with Next.js. Deploy to Vercel in minutes.
+
+Access here: [AI Webpage Summarizer](https://ai-webpage-summarizer.vercel.app)
 
 ---
 
