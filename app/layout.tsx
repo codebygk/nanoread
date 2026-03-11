@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Webpage Summarizer",
-  description: "Paste any URL and get a clean AI-powered summary in seconds.",
+  title: "Nanoread - AI Webpage Summarizer",
+  description: "Paste any URL and get a clean AI-powered summary instantly.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

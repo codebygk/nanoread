@@ -1,0 +1,239 @@
+"use client";
+
+// ─────────────────────────────────────────────
+// UrlSearchCard – URL input form, status row,
+//                 and example quick-links
+// ─────────────────────────────────────────────
+
+import { type RefObject } from "react";
+import { CheckIcon, LinkIcon } from "@/components/icons";
+import { EXAMPLE_URLS }        from "@/lib/constants";
+import { getEndpointLabel }    from "@/lib/utils";
+import type { Settings }       from "@/types";
+
+interface UrlSearchCardProps {
+  url:         string;
+  loading:     boolean;
+  settings:    Settings;
+  inputRef:    RefObject<HTMLInputElement | null>;
+  onChange:    (url: string) => void;
+  onSubmit:    (e: React.FormEvent | null, overrideUrl?: string) => void;
+}
+
+export function UrlSearchCard({
+  url,
+  loading,
+  settings,
+  inputRef,
+  onChange,
+  onSubmit,
+}: UrlSearchCardProps) {
+  const isDisabled   = loading || !url.trim() || !settings.apiKey;
+  const endpointLabel = getEndpointLabel(settings.baseUrl);
+
+  return (
+    <div className="fade-up-2" style={{
+      background:   "var(--bg-card)",
+      border:       "1px solid var(--border)",
+      borderRadius: 16,
+      padding:      20,
+      boxShadow:    "var(--shadow-md)",
+      marginBottom: 20,
+    }}>
+      {/* ── URL input row ── */}
+      <form onSubmit={onSubmit}>
+        <div
+          style={{
+            display:    "flex",
+            alignItems: "center",
+            gap:        10,
+            background: "var(--bg-subtle)",
+            border:     "1.5px solid var(--border)",
+            borderRadius: 10,
+            padding:    "4px 4px 4px 14px",
+            transition: "border-color 0.15s",
+          }}
+          onFocusCapture={e => (e.currentTarget.style.borderColor = "var(--accent)")}
+          onBlurCapture={e  => (e.currentTarget.style.borderColor = "var(--border)")}
+        >
+          <span style={{ flexShrink: 0, color: "var(--text-3)", display: "flex" }}>
+            <LinkIcon size={16} />
+          </span>
+
+          <input
+            ref={inputRef}
+            type="text"
+            value={url}
+            onChange={e => onChange(e.target.value)}
+            placeholder="Paste a URL to summarize…"
+            disabled={loading}
+            style={{
+              flex:       1,
+              background: "transparent",
+              border:     "none",
+              outline:    "none",
+              color:      "var(--text)",
+              fontSize:   "0.9375rem",
+              fontFamily: "inherit",
+              padding:    "8px 0",
+            }}
+          />
+
+          <SubmitButton loading={loading} disabled={isDisabled} />
+        </div>
+      </form>
+
+      {/* ── Status row ── */}
+      <StatusRow
+        endpointLabel={endpointLabel}
+        model={settings.model}
+        hasApiKey={!!settings.apiKey}
+      />
+    </div>
+  );
+}
+
+// ── Sub-components ────────────────────────────
+
+interface SubmitButtonProps {
+  loading:  boolean;
+  disabled: boolean;
+}
+
+function SubmitButton({ loading, disabled }: SubmitButtonProps) {
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      style={{
+        background:   disabled ? "var(--border)" : "var(--accent)",
+        color:        disabled ? "var(--text-3)" : "white",
+        border:       "none",
+        borderRadius: 7,
+        padding:      "9px 20px",
+        fontSize:     "0.875rem",
+        fontWeight:   600,
+        cursor:       disabled ? "not-allowed" : "pointer",
+        display:      "flex",
+        alignItems:   "center",
+        gap:          7,
+        transition:   "all 0.15s",
+        flexShrink:   0,
+        fontFamily:   "inherit",
+      }}
+    >
+      {loading
+        ? <><span className="spinner" /> Summarizing…</>
+        : "Summarize"
+      }
+    </button>
+  );
+}
+
+interface StatusRowProps {
+  endpointLabel: string;
+  model:         string;
+  hasApiKey:     boolean;
+}
+
+function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
+  return (
+    <div style={{
+      display:    "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop:  12,
+      flexWrap:   "wrap",
+      gap:        6,
+    }}>
+      <span style={{
+        display:      "inline-flex",
+        alignItems:   "center",
+        gap:          5,
+        background:   "var(--accent-bg)",
+        color:        "var(--accent)",
+        fontSize:     "0.75rem",
+        fontWeight:   500,
+        padding:      "3px 10px",
+        borderRadius: 20,
+      }}>
+        <span style={{
+          width:        6,
+          height:       6,
+          borderRadius: "50%",
+          background:   "var(--accent)",
+          display:      "inline-block",
+        }} />
+        {endpointLabel} · {model}
+      </span>
+
+      <span style={{
+        fontSize:   "0.75rem",
+        color:      hasApiKey ? "var(--success)" : "#f59e0b",
+        display:    "flex",
+        alignItems: "center",
+        gap:        4,
+        fontWeight: 500,
+      }}>
+        {hasApiKey
+          ? <><CheckIcon /> API key set</>
+          : <>🔑 No key - add in Settings</>
+        }
+      </span>
+    </div>
+  );
+}
+
+// ── Example chips ─────────────────────────────
+
+interface ExampleChipsProps {
+  onSelect: (url: string) => void;
+}
+
+export function ExampleChips({ onSelect }: ExampleChipsProps) {
+  return (
+    <div className="fade-up-3" style={{
+      display:        "flex",
+      alignItems:     "center",
+      gap:            8,
+      flexWrap:       "wrap",
+      justifyContent: "center",
+      marginBottom:   32,
+    }}>
+      <span style={{ fontSize: "0.75rem", color: "var(--text-3)", fontWeight: 500 }}>
+        Try:
+      </span>
+      {EXAMPLE_URLS.map(ex => (
+        <button
+          key={ex.url}
+          onClick={() => onSelect(ex.url)}
+          style={{
+            display:      "inline-flex",
+            alignItems:   "center",
+            gap:          5,
+            padding:      "5px 12px",
+            borderRadius: 20,
+            border:       "1px solid var(--border)",
+            background:   "var(--bg-card)",
+            color:        "var(--text-2)",
+            fontSize:     "0.8rem",
+            fontWeight:   500,
+            cursor:       "pointer",
+            transition:   "all 0.15s",
+            fontFamily:   "inherit",
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.borderColor = "var(--accent)";
+            e.currentTarget.style.color       = "var(--accent)";
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.borderColor = "var(--border)";
+            e.currentTarget.style.color       = "var(--text-2)";
+          }}
+        >
+          {ex.emoji} {ex.label}
+        </button>
+      ))}
+    </div>
+  );
+}

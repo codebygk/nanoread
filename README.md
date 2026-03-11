@@ -1,9 +1,9 @@
-# AI Webpage Summarizer
+# Nanoread - AI Webpage Summarizer
 
 A clean, fast web app that summarizes any webpage using AI. Paste a URL, pick your provider, and get the key points in seconds.
 
 
-Access here: [AI Webpage Summarizer](https://ai-webpage-summarizer.vercel.app)
+Access here: [Nanoread](https://nanoread.vercel.app)
 
 ---
 
