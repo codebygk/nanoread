@@ -29,18 +29,18 @@ export const DEFAULT_SETTINGS: Settings = {
 // ── LLM provider presets ──────────────────────
 export const PROVIDER_PRESETS = [
     {
-        label: "Ollama (free)",
-        baseUrl: "http://localhost:11434/v1",
-        model: "llama3.2",
-        keyHint: "ollama",
-        keyLink: "https://ollama.com/download",
-    },
-    {
         label: "Groq (free)",
         baseUrl: "https://api.groq.com/openai/v1",
         model: "llama-3.1-8b-instant",
         keyHint: "gsk_...",
         keyLink: "https://console.groq.com/keys",
+    },
+    {
+        label: "Ollama (free)",
+        baseUrl: "http://localhost:11434/v1",
+        model: "llama3.2",
+        keyHint: "ollama",
+        keyLink: "https://ollama.com/download",
     },
     {
         label: "LM Studio (free)",

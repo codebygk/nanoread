@@ -28,6 +28,7 @@ import HistoryPanel        from "@/components/HistoryPanel";
 
 // Types
 import type { SummarizeResult } from "@/types";
+import Image from "next/image";
 
 // ─────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ export default function Home() {
   const [showHistory,  setShowHistory]  = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   const { settings,  saveSettings,  loadSettings  } = useSettings();
   const { history,   addToHistory,  clearHistory,
@@ -78,6 +80,10 @@ export default function Home() {
       });
       setResult(data);
       addToHistory(data, settings.model);
+      setResult(data);
+      setTimeout(() => {
+        summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -128,7 +134,8 @@ export default function Home() {
         flex:     1,
       }}>
         {/* Hero */}
-        <div className="fade-up-1" style={{ textAlign: "center", marginBottom: 40 }}>
+        <div className="fade-up-1" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: 40 }}>
+          <Image src={"/read.svg"} alt="nanoread-hero-image" width={250} height={250}/>
           <h1 className="font-display" style={{
             fontSize:      "clamp(2rem, 8vw, 4rem)",
             color:         "var(--text)",
@@ -171,12 +178,14 @@ export default function Home() {
         {error   && <ErrorAlert message={error} onOpenSettings={() => setShowSettings(true)} />}
         {loading && <LoadingSkeleton />}
         {result  && !loading && (
+          <div ref={summaryRef}>
           <SummaryResult
             result={result}
             copied={copied}
             onCopy={() => copy(result.summary)}
             onReset={handleReset}
           />
+          </div>
         )}
       </main>
 
