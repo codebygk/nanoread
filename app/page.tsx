@@ -184,7 +184,7 @@ export default function Home() {
             fontWeight:    400,
             letterSpacing: "-0.01em",
           }}>
-            Paste a URL, choose your AI provider, get the key points instantly.
+            Paste a URL or select from the examples to get the summary of webpage instantly.
           </p>
         </div>
 
