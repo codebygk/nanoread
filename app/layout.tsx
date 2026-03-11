@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Nanoread - AI Webpage Summarizer",
   description: "Paste any URL and get a clean AI-powered summary instantly.",
+    icons: {
+    icon: "/favicon.svg"
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -95,7 +95,7 @@ export default function SettingsModal({ settings, onSave, onClose }: SettingsMod
           {/* ── Model ── */}
           <FormField
             label="Model"
-            hint="Examples: llama3.2, mistral, llama-3.3-70b-versatile"
+            hint="Examples: llama3.2, mistral, llama-3.1-8b-instant"
           >
             <input
               type="text"

@@ -1,8 +1,6 @@
-
-@import "tailwindcss";
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import 'tailwindcss';
 
 /* ── Light theme ───────────────────────────────── */
 :root {
@@ -14,9 +12,9 @@
   --text:      #111827;
   --text-2:    #4b5563;
   --text-3:    #9ca3af;
-  --accent:    #6366f1;
-  --accent-2:  #4f46e5;
-  --accent-bg: #eef2ff;
+  --accent:    #0d9488;
+  --accent-2:  #0f766e;
+  --accent-bg: #f0fdfa;
   --success:   #059669;
   --error-bg:  #fef2f2;
   --error-border: #fecaca;
@@ -37,9 +35,9 @@
   --text:      #f1f5f9;
   --text-2:    #94a3b8;
   --text-3:    #475569;
-  --accent:    #818cf8;
-  --accent-2:  #6366f1;
-  --accent-bg: #1e1b4b;
+  --accent:    #2dd4bf;
+  --accent-2:  #14b8a6;
+  --accent-bg: #042f2e;
   --success:   #34d399;
   --error-bg:  #1f0f0f;
   --error-border: #7f1d1d;
