@@ -199,7 +199,7 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
         fontWeight:   500,
         padding:      "3px 10px",
         borderRadius: 20,
-        maxWidth:     "60%",
+        maxWidth:     "80%",
         overflow:     "hidden",
         textOverflow: "ellipsis",
         whiteSpace:   "nowrap",
@@ -225,8 +225,8 @@ function StatusRow({ endpointLabel, model, hasApiKey }: StatusRowProps) {
         flexShrink: 0,
       }}>
         {hasApiKey
-          ? <><CheckIcon /> Your API key</>
-          : <><CheckIcon /> Free tier</>
+          ? <><CheckIcon /> User API Key</>
+          : <><CheckIcon /> Free API Key</>
         }
       </span>
     </div>
